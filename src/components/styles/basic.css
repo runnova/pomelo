@@ -1,0 +1,76 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+  background-color: black;
+  color: var(--fg-one);
+}
+
+#root {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-one);
+}
+
+:root {
+  --bg-one: #080808;
+  --bg-two: #161616;
+  --bg-three: #1d1d1d;
+  --bg-four: #3a3a3a;
+  --diff-one: color-mix(in srgb, var(--bg-four) 15%, transparent);
+  --diff-two: color-mix(in srgb, var(--bg-four) 30%, transparent);
+  --diff-three: color-mix(in srgb, var(--bg-four) 45%, transparent);
+  --hl-one: #aaff2a;
+  --hl-two: #d5ff95;
+  --hl-three: #57b400;
+  --hl-four: #2d3f1d;
+  --border: 0px 0px 0 1px #fff3;
+  --fg-one: #fff;
+  --fg-two: #ffffff7a;
+  --fg-dim: #ffffffb7;
+  --fg-three: #cfa4ff
+}
+
+.x,
+.y,
+.fill,
+.gg {
+  display: flex;
+
+  &.x {
+    flex-direction: row;
+  }
+
+  &.y {
+    flex-direction: column;
+  }
+
+  &.fill {
+    flex-grow: 1;
+  }
+
+  &.gg {
+    gap: .5em;
+  }
+}
+
+.label {
+  font-size: small;
+  opacity: .5;
+  margin: .5em;
+}
+
+button {
+  all: unset;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  cursor: pointer;
+  padding: .5em;
+
+  &:hover {
+    background-color: var(--diff-three);
+  }
+}

@@ -1,0 +1,87 @@
+.timeline_container {
+
+  & .timeline {
+    border-top: 1px solid var(--diff-three);
+    padding: .5em;
+    gap: .5em;
+  }
+
+  & .timeline_add {
+    width: 2em;
+    height: 2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: .5em;
+    border-radius: .3em;
+    cursor: pointer;
+    background-color: var(--bg-two);
+    border: 1px solid var(--diff-three);
+  }
+
+  & .timeline_item {
+    width: 5em;
+    height: 2em;
+    padding: .5em;
+    border-radius: .3em;
+    background-color: var(--bg-two);
+    border: 1px solid var(--diff-three);
+    user-select: none;
+    position: relative;
+
+    & .remove {
+      position: absolute;
+      padding: .3em;
+      top: .2em;
+      right: .2em;
+      border-radius: .2em;
+      display: flex;
+      align-items: center;
+      display: none;
+    }
+
+    &:active {
+      cursor: grabbing;
+      transform: rotate(-3deg);
+      opacity: .5;
+    }
+
+    &>.index {
+      font-size: small;
+    }
+
+    &.active {
+      background-color: var(--hl-three);
+    }
+
+    &:hover {
+      filter: brightness(120%);
+      & .remove {
+        display: flex;
+      }
+    }
+  }
+
+  & .quick_action_tiles {
+    border-top: 1px solid var(--diff-three);
+
+    &>* {
+      display: flex;
+      gap: .3em;
+      flex-direction: row;
+      align-items: center;
+
+      &:not(:last-child) {
+        box-shadow: 11px 0px 0 -10px var(--diff-three);
+      }
+
+      &:hover {
+        box-shadow: none;
+      }
+
+      & svg {
+        color: var(--hl-one);
+      }
+    }
+  }
+}

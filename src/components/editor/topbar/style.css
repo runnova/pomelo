@@ -1,0 +1,57 @@
+.topbar {
+  border-bottom: 1px solid var(--diff-three);
+  justify-content: space-between;
+  align-items: center;
+
+  & .dropdown-trigger {
+    padding: .3em .3em;
+    border: none;
+    align-items: center;
+    background-color: transparent;
+
+    & svg {
+      opacity: .3;
+    }
+  }
+
+  & .raw_toggle {
+    background-color: var(--diff-one);
+    border-radius: .3em;
+    align-items: center;
+    margin: 3px;
+    padding: 2px;
+    gap: 3px;
+
+    &>* {
+      padding: 3px .6em;
+      border-radius: inherit;
+      cursor: pointer;
+
+      &:hover {
+        background-color: var(--diff-two);
+      }
+
+      &.active {
+        background-color: var(--diff-three);
+        color: var(--hl-one);
+      }
+    }
+  }
+
+  & .btn {
+    all: unset;
+    color: var(--fg-two);
+    padding: .5em .8em;
+    border: none;
+    cursor: pointer;
+    background-color: transparent;
+
+    &.alive {
+      color: var(--hl-one);
+    }
+
+    &:hover {
+      background-color: var(--diff-two);
+    }
+  }
+}

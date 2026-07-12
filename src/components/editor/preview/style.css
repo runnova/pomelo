@@ -1,0 +1,52 @@
+.previewContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1em;
+
+  &>.previewPage {
+    background-color: white;
+    color: black;
+    width: 700px;
+    aspect-ratio: 16/9;
+    gap: 1em;
+    padding: 1em;
+    display: flex;
+
+    &>.col {
+      flex-grow: 1;
+      width: 0;
+      display: flex;
+    min-width: 0;
+      flex-direction: column;
+      justify-content: center;
+
+      &.media .node>* {
+        width: fit-content;
+        object-fit: contain;
+        max-width: 100%;
+      }
+    }
+
+    & .node {
+      min-height: 1em;
+      min-width: 1em;
+      &:hover {
+        outline: 2px solid var(--hl-one);
+        outline-offset: 5px;
+      }
+    }
+  }
+}
+
+.player_buttons {
+  border-top: 1px solid var(--diff-three);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.current_index_display {
+  opacity: .5;
+  font-size: small;
+  padding: .5em;
+}
