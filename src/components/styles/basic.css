@@ -74,3 +74,41 @@ button {
     background-color: var(--diff-three);
   }
 }
+
+hr {
+    width: calc(100% - 1em);
+    color: var(--diff-three);
+    border-color: var(--diff-three);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--diff-three) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--diff-two);
+  border-radius: 999px;
+  border: 2px solid var(--bg-one);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--hl-three);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: var(--hl-one);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}

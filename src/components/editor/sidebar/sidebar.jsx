@@ -1,28 +1,110 @@
-import { Show, createSignal } from "solid-js";
+import { Show, createSignal, For } from "solid-js";
 import {
   HiOutlineArrowRightEndOnRectangle,
   HiOutlineArrowUpTray,
   HiOutlineViewColumns
 } from "solid-icons/hi";
-import {
-  createTextNode,
-  addNode,
-  editor
-} from "../State";
+import { getCurrentCard, editor, addNode, updateNode, createTextNode, createMediaNode } from "../State"
 import "./style.css";
 
 export default function Sidebar() {
   const [page, setPage] = createSignal("insert");
 
-  const insertText = (level, content = "") => {
-    if (!editor.card.current) return;
+  const quickInsertTemplates = {
+    H1: {
+      type: "text",
+      content: "Heading 1",
+      style: {
+        "font-size": "48px",
+        "font-weight": 700,
+        "font-style": "normal",
+        "line-height": "1.1",
+        "letter-spacing": "0px",
+        "text-align": "left",
+        "text-decoration": "none"
+      }
+    },
 
-    const node = createTextNode();
-    node.content = content;
-    node.level = level;
+    H2: {
+      type: "text",
+      content: "Heading 2",
+      style: {
+        "font-size": "36px",
+        "font-weight": 700,
+        "font-style": "normal",
+        "line-height": "1.2",
+        "letter-spacing": "0px",
+        "text-align": "left",
+        "text-decoration": "none"
+      }
+    },
 
-    addNode(editor.card.current, node);
-  };
+    H3: {
+      type: "text",
+      content: "Heading 3",
+      style: {
+        "font-size": "28px",
+        "font-weight": 600,
+        "font-style": "normal",
+        "line-height": "1.3",
+        "letter-spacing": "0px",
+        "text-align": "left",
+        "text-decoration": "none"
+      }
+    },
+
+    Sub: {
+      type: "text",
+      content: "Subtitle",
+      style: {
+        "font-size": "20px",
+        "font-weight": 400,
+        "font-style": "normal",
+        "line-height": "1.4",
+        "letter-spacing": "0px",
+        "text-align": "left",
+        "text-decoration": "none"
+      }
+    },
+
+    P: {
+      type: "text",
+      content: "Paragraph text",
+      style: {
+        "font-size": "16px",
+        "font-weight": 400,
+        "font-style": "normal",
+        "line-height": "1.6",
+        "letter-spacing": "0px",
+        "text-align": "left",
+        "text-decoration": "none"
+      }
+    },
+
+    Foot: {
+      type: "text",
+      content: "Footer text",
+      style: {
+        "font-size": "12px",
+        "font-weight": 400,
+        "font-style": "normal",
+        "line-height": "1.4",
+        "letter-spacing": "0px",
+        "text-align": "left",
+        "margin-top": "auto",
+        "text-decoration": "none"
+      }
+    }
+  }
+  const insertTemplate = (template) => {
+    if (!editor.card.current) return
+
+    const node = createTextNode()
+
+    Object.assign(node, quickInsertTemplates[template])
+
+    addNode(editor.card.current, node)
+  }
 
   return (
     <div class="sidebar x">
@@ -56,29 +138,16 @@ export default function Sidebar() {
               <div class="label">Quick Insert</div>
 
               <div class="quick_insert_tiles">
-                <div class="insert_tile" onClick={() => insertText(1)}>
-                  H1
-                </div>
-
-                <div class="insert_tile" onClick={() => insertText(2)}>
-                  H2
-                </div>
-
-                <div class="insert_tile" onClick={() => insertText(3)}>
-                  H3
-                </div>
-
-                <div class="insert_tile" onClick={() => insertText(null)}>
-                  Sub
-                </div>
-
-                <div class="insert_tile" onClick={() => insertText(null)}>
-                  P
-                </div>
-
-                <div class="insert_tile" onClick={() => insertText(null)}>
-                  Foot
-                </div>
+                <For each={Object.keys(quickInsertTemplates)}>
+                  {template => (
+                    <div
+                      class="insert_tile"
+                      onClick={() => insertTemplate(template)}
+                    >
+                      {template}
+                    </div>
+                  )}
+                </For>
               </div>
 
               <div class="label">Text</div>

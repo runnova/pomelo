@@ -51,16 +51,23 @@ export function createTextNode() {
 
     column: "text",
 
-    meta: {},
-
     content: "",
 
     level: null,
 
-    footnote: null
+    footnote: null,
+
+    color: "#000000",
+    fontSize: "16px",
+    fontFamily: "sans-serif",
+    fontWeight: "400",
+    fontStyle: "normal",
+    textAlign: "left",
+    lineHeight: "1.5",
+    letterSpacing: "normal",
+    textDecoration: "none"
   }
 }
-
 export function createMediaNode() {
   return {
     id: id(),
@@ -68,8 +75,6 @@ export function createMediaNode() {
     type: "media",
 
     column: "media",
-
-    meta: {},
 
     src: "",
 
@@ -83,7 +88,11 @@ export function createMediaNode() {
 
     autoplay: false,
 
-    loop: false
+    loop: false,
+
+    muted: false,
+
+    controls: true
   }
 }
 
@@ -155,6 +164,22 @@ export function updateNode(cardId, nodeId, updater) {
   setProject("cards", cardIndex, "nodes", nodeIndex, updater)
 }
 
+export function updateNodeById(nodeId, updater) {
+  const cardIndex = project.cards.findIndex(card =>
+    card.nodes.some(node => node.id === nodeId)
+  )
+
+  if (cardIndex === -1) return
+
+  const nodeIndex = project.cards[cardIndex].nodes.findIndex(
+    node => node.id === nodeId
+  )
+
+  if (nodeIndex === -1) return
+
+  setProject("cards", cardIndex, "nodes", nodeIndex, updater)
+}
+
 export function getCardIndex(cardId) {
   return project.cards.findIndex(card => card.id === cardId)
 }
@@ -171,9 +196,28 @@ export function getCurrentCard() {
   return project.cards.find(card => card.id === editor.card.current) ?? null
 }
 
+export function focusNode(nodeId) {
+  setEditor("focus", nodeId)
+}
+
+export function blurNode() {
+  setEditor("focus", null)
+}
+
+export function getFocusedNode() {
+  if (!editor.focus) return null
+
+  const card = getCurrentCard()
+  if (!card) return null
+
+  return card.nodes.find(node => node.id === editor.focus) ?? null
+}
+
 export const [editor, setEditor] = createStore({
   projectPath: null,
   dirty: false,
+
+  focus: null,
 
   card: {
     current: null,
@@ -233,5 +277,9 @@ window.app = {
   loadProject,
   saveProject,
 
-  getCurrentCard
+  getCurrentCard,
+
+  focusNode,
+  blurNode,
+  getFocusedNode
 }

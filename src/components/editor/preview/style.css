@@ -30,10 +30,14 @@
 
     & .node {
       min-height: 1em;
+      border-radius: .3em;
       min-width: 1em;
-      &:hover {
+      &:hover, &.focused {
         outline: 2px solid var(--hl-one);
-        outline-offset: 5px;
+
+        &.focused {
+          box-shadow: 0 0 1em var(--hl-two);
+        }
       }
     }
   }

@@ -1,10 +1,6 @@
 import "./style.css"
 import { For } from "solid-js"
 import {
-  HiOutlineClipboardDocument,
-  HiOutlineClipboardDocumentCheck,
-  HiOutlineDocumentDuplicate,
-  HiOutlineTrash,
   HiOutlinePlus,
   HiOutlineXMark,
 } from "solid-icons/hi"
@@ -55,28 +51,6 @@ export default function Timeline() {
 
         <button class="timeline_add" onClick={addCard}>
           <HiOutlinePlus size={18} />
-        </button>
-      </div>
-
-      <div class="quick_action_tiles x">
-        <button>
-          <HiOutlineClipboardDocument size={18} />
-          <span>Copy</span>
-        </button>
-
-        <button>
-          <HiOutlineClipboardDocumentCheck size={18} />
-          <span>Paste</span>
-        </button>
-
-        <button>
-          <HiOutlineDocumentDuplicate size={18} />
-          <span>Duplicate</span>
-        </button>
-
-        <button>
-          <HiOutlineTrash size={18} />
-          <span>Delete</span>
         </button>
       </div>
     </div>

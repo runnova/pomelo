@@ -1,9 +1,14 @@
 .timeline_container {
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
 
   & .timeline {
     border-top: 1px solid var(--diff-three);
     padding: .5em;
     gap: .5em;
+    width: 0;
+    flex: 1;
   }
 
   & .timeline_add {
@@ -21,6 +26,7 @@
 
   & .timeline_item {
     width: 5em;
+    min-width: 5em;
     height: 2em;
     padding: .5em;
     border-radius: .3em;
@@ -56,31 +62,9 @@
 
     &:hover {
       filter: brightness(120%);
+
       & .remove {
         display: flex;
-      }
-    }
-  }
-
-  & .quick_action_tiles {
-    border-top: 1px solid var(--diff-three);
-
-    &>* {
-      display: flex;
-      gap: .3em;
-      flex-direction: row;
-      align-items: center;
-
-      &:not(:last-child) {
-        box-shadow: 11px 0px 0 -10px var(--diff-three);
-      }
-
-      &:hover {
-        box-shadow: none;
-      }
-
-      & svg {
-        color: var(--hl-one);
       }
     }
   }

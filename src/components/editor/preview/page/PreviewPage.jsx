@@ -1,36 +1,13 @@
-import { For, Show } from "solid-js"
-import { getCurrentCard } from "../../State"
+import { For, Show, onMount, onCleanup, createMemo } from "solid-js"
+import { getCurrentCard, focusNode, blurNode, editor } from "../../State"
 
 function RenderText(props) {
-  const { node } = props
-
-  const style = {
-    color: node.meta.color,
-    "font-size": node.meta.fontSize,
-    "font-family": node.meta.fontFamily,
-    "font-weight": node.meta.fontWeight,
-    "font-style": node.meta.fontStyle,
-    "text-align": node.meta.textAlign,
-    "line-height": node.meta.lineHeight,
-    "letter-spacing": node.meta.letterSpacing,
-    "text-decoration": node.meta.textDecoration
-  }
-
-  switch (node.level) {
-    case 1:
-      return <h1 style={style}>{node.content}</h1>
-
-    case 2:
-      return <h2 style={style}>{node.content}</h2>
-
-    case 3:
-      return <h3 style={style}>{node.content}</h3>
-
-    default:
-      return <p style={style}>{node.content}</p>
-  }
+  return (
+    <>
+      {props.node.content}
+    </>
+  )
 }
-
 function RenderMedia(props) {
   const { node } = props
 
@@ -41,7 +18,7 @@ function RenderMedia(props) {
           src={node.src}
           alt={node.caption}
           style={{
-            "object-fit": node.meta.fit
+            "object-fit": node.fit
           }}
         />
       )
@@ -55,7 +32,7 @@ function RenderMedia(props) {
           loop={node.loop}
           muted={node.muted}
           style={{
-            "object-fit": node.meta.fit
+            "object-fit": node.fit
           }}
         />
       )
@@ -74,6 +51,14 @@ function RenderNode(props) {
       data-id={node.id}
       data-type={node.type}
       data-column={node.column}
+      style={node.style}
+      classList={{
+        focused: editor.focus === node.id
+      }}
+      onClick={e => {
+        e.stopPropagation()
+        focusNode(node.id)
+      }}
     >
       {(() => {
         switch (node.type) {
@@ -92,11 +77,26 @@ function RenderNode(props) {
 }
 
 export default function PreviewPage() {
+
+  onMount(() => {
+    const handler = e => {
+      if (e.key === "Escape") {
+        blurNode()
+      }
+    }
+
+    window.addEventListener("keydown", handler)
+
+    onCleanup(() => {
+      window.removeEventListener("keydown", handler)
+    })
+  })
   return (
     <Show when={getCurrentCard()}>
       {card => (
         <div
           class="card previewPage"
+          onClick={() => blurNode()}
           style={{
             padding: `${card().layout.padding}px`,
             gap: `${card().layout.gap}px`
