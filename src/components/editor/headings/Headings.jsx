@@ -1,6 +1,16 @@
 import "./style.css"
 import { Show, For, Index, createSignal } from "solid-js"
-import { getFocusedNode, updateNodeById } from "../State"
+import {
+  getFocusedNode,
+  updateNodeById,
+  removeNode,
+  getCurrentCard,
+  copyNode,
+  pasteNode,
+  duplicateNode,
+  hasClipboardNode,
+  focusNode
+} from "../State"
 
 import {
   HiOutlineClipboardDocument,
@@ -37,6 +47,52 @@ export default function Headings() {
 
   return (
     <div class="headings_sidebar">
+      <div class="quick_action_tiles x">
+        <button
+          disabled={!focusedNode()}
+          class={!focusedNode() ? "disabled" : ""}
+          onClick={() => copyNode(focusedNode().id)}
+        >
+          <HiOutlineClipboardDocument size={18} />
+          <span>Copy</span>
+        </button>
+
+        <button
+          disabled={!hasClipboardNode()}
+          class={!hasClipboardNode() ? "disabled" : ""}
+          onClick={() => {
+            const pasted = pasteNode(getCurrentCard().id)
+            if (pasted) focusNode(pasted.id)
+          }}
+        >
+          <HiOutlineClipboardDocumentCheck size={18} />
+          <span>Paste</span>
+        </button>
+
+        <button
+          disabled={!focusedNode()}
+          class={!focusedNode() ? "disabled" : ""}
+          onClick={() => {
+            const copy = duplicateNode(focusedNode().id)
+            if (copy) focusNode(copy.id)
+          }}
+        >
+          <HiOutlineDocumentDuplicate size={18} />
+          <span>Duplicate</span>
+        </button>
+
+        <button
+          disabled={!focusedNode()}
+          class={!focusedNode() ? "disabled" : ""}
+          onClick={() => {
+            removeNode(getCurrentCard().id, focusedNode().id)
+            focusNode(null)
+          }}
+        >
+          <HiOutlineTrash size={18} />
+          <span>Delete</span>
+        </button>
+      </div>
       <Show when={focusedNode()}>
         {node => (
           <>
@@ -111,32 +167,9 @@ export default function Headings() {
                 <HiOutlinePlus></HiOutlinePlus>
               </button>
             </div>
-
-            <div class="quick_action_tiles x">
-              <button>
-                <HiOutlineClipboardDocument size={18} />
-                <span>Copy</span>
-              </button>
-
-              <button className="disabled">
-                <HiOutlineClipboardDocumentCheck size={18} />
-                <span>Paste</span>
-              </button>
-
-              <button>
-                <HiOutlineDocumentDuplicate size={18} />
-                <span>Duplicate</span>
-              </button>
-
-              <button>
-                <HiOutlineTrash size={18} />
-                <span>Delete</span>
-              </button>
-            </div>
           </>
         )}
       </Show>
-
       <div class="label">Headings</div>
 
       <div class="heading">

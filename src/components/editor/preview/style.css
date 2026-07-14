@@ -17,7 +17,7 @@
       flex-grow: 1;
       width: 0;
       display: flex;
-    min-width: 0;
+      min-width: 0;
       flex-direction: column;
       justify-content: center;
 
@@ -32,10 +32,18 @@
       min-height: 1em;
       border-radius: .3em;
       min-width: 1em;
-      &:hover, &.focused {
+      user-select: none;
+
+      & img {
+        width: 100%;
+      }
+
+      &:hover,
+      &.focused {
         outline: 2px solid var(--hl-one);
 
         &.focused {
+          user-select: all;
           box-shadow: 0 0 1em var(--hl-two);
         }
       }

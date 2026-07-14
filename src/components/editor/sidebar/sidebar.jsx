@@ -94,6 +94,22 @@ export default function Sidebar() {
         "margin-top": "auto",
         "text-decoration": "none"
       }
+    },
+
+    Media: {
+      type: "media",
+      content: "",
+      mediaType: "image",
+      src: "https://attachments.mistium.com/36a55c76-86ed-44c0-af47-5cb6acc85db1.png",
+      style: {
+        "font-size": "12px",
+        "font-weight": 400,
+        "font-style": "normal",
+        "line-height": "1.4",
+        "letter-spacing": "0px",
+        "text-align": "left",
+        "text-decoration": "none"
+      }
     }
   }
   const insertTemplate = (template) => {

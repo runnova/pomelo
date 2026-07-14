@@ -64,7 +64,7 @@
 .quick_action_tiles {
   border-top: 1px solid var(--diff-three);
   border-bottom: 1px solid var(--diff-three);
-  margin-top: .5em;
+  margin-bottom: .5em;
 
   &>* {
     display: flex;

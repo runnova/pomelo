@@ -1,6 +1,7 @@
-import { createStore } from "solid-js/store"
+import { createStore, unwrap } from "solid-js/store"
 
 const id = () => crypto.randomUUID()
+let clipboardNode = null
 
 export const [project, setProject] = createStore({
   id: id(),
@@ -138,6 +139,7 @@ export function addNode(cardId, node) {
 }
 
 export function removeNode(cardId, nodeId) {
+  console.log(cardId, nodeId)
   const cardIndex = project.cards.findIndex(card => card.id === cardId)
 
   if (cardIndex === -1) return
@@ -254,6 +256,88 @@ export const [editor, setEditor] = createStore({
     redo: []
   }
 })
+
+export function copyNode(nodeId) {
+  const card = project.cards.find(card =>
+    card.nodes.some(node => node.id === nodeId)
+  )
+
+  if (!card) return
+
+  const node = card.nodes.find(node => node.id === nodeId)
+clipboardNode = structuredClone(unwrap(node))
+}
+
+export function pasteNode(cardId) {
+  if (!clipboardNode) return
+
+  const node = structuredClone(unwrap(clipboardNode))
+  node.id = id()
+
+  addNode(cardId, node)
+
+  return node
+}
+
+export function duplicateNode(nodeId) {
+  const card = project.cards.find(card =>
+    card.nodes.some(node => node.id === nodeId)
+  )
+
+  if (!card) return
+
+  const node = card.nodes.find(node => node.id === nodeId)
+const copy = structuredClone(unwrap(node))
+  copy.id = id()
+
+  addNode(card.id, copy)
+
+  return copy
+}
+
+export function hasClipboardNode() {
+  return clipboardNode !== null
+}
+
+export function moveNode(cardId, nodeId, targetColumn, targetIndex) {
+  const cardIndex = project.cards.findIndex(c => c.id === cardId)
+  if (cardIndex === -1) return
+
+  const nodes = [...project.cards[cardIndex].nodes]
+
+  const sourceIndex = nodes.findIndex(n => n.id === nodeId)
+  if (sourceIndex === -1) return
+
+  const node = {
+    ...nodes[sourceIndex],
+    column: targetColumn
+  }
+
+  nodes.splice(sourceIndex, 1)
+
+  const filtered = nodes.filter(n => n.column === targetColumn)
+
+  let insertBefore
+
+  if (targetIndex >= filtered.length) {
+    insertBefore = nodes.findIndex(n => n.column === targetColumn)
+    if (insertBefore === -1) {
+      nodes.push(node)
+    } else {
+      let last = -1
+      for (let i = 0; i < nodes.length; i++) {
+        if (nodes[i].column === targetColumn) last = i
+      }
+      nodes.splice(last + 1, 0, node)
+    }
+  } else {
+    const targetId = filtered[targetIndex].id
+    insertBefore = nodes.findIndex(n => n.id === targetId)
+    nodes.splice(insertBefore, 0, node)
+  }
+
+  setProject("cards", cardIndex, "nodes", nodes)
+}
 
 window.app = {
   project,
