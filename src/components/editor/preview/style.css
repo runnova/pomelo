@@ -34,6 +34,10 @@
       min-width: 1em;
       user-select: none;
 
+      &>* {
+        outline: none;
+      }
+
       & img {
         width: 100%;
       }
