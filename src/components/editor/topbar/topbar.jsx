@@ -56,6 +56,9 @@ export default function Topbar() {
           <button className="btn">
             Saving...
           </button>
+          <button className="alive btn">
+            Play
+          </button>
           <button className="alive btn" onClick={exportProject}>
             Export
           </button>

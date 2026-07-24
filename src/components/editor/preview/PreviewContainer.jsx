@@ -12,12 +12,12 @@ import PreviewPage from "./page/PreviewPage";
 
 export default function PreviewContainer() {
   const [playing, setPlaying] = createSignal(true)
-  const [value, setValue] = createSignal(50);
+  const [zoom, setZoom] = createSignal(50);
 
   return (
     <div class="preview_player fill y">
       <div class="previewContainer fill">
-        <PreviewPage/>
+        <PreviewPage zoom={zoom}/>
       </div>
 
       <div class="player_buttons x">
@@ -46,8 +46,8 @@ export default function PreviewContainer() {
           min={0}
           max={100}
           step={1}
-          value={value()}
-          onInput={setValue}
+          value={zoom()}
+          onInput={setZoom}
         />
       </div>
     </div>

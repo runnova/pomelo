@@ -130,6 +130,21 @@ export function updateCard(cardId, updater) {
   setProject("cards", index, updater)
 }
 
+export function moveCard(sourceId, targetIndex) {
+  const cards = [...project.cards]
+
+  const sourceIndex = cards.findIndex(card => card.id === sourceId)
+  if (sourceIndex === -1) return
+
+  const [card] = cards.splice(sourceIndex, 1)
+
+  const clampedIndex = Math.max(0, Math.min(targetIndex, cards.length))
+
+  cards.splice(clampedIndex, 0, card)
+
+  setProject("cards", cards)
+}
+
 export function addNode(cardId, node) {
   const index = project.cards.findIndex(card => card.id === cardId)
 
@@ -195,7 +210,14 @@ export function saveProject() {
 }
 
 export function getCurrentCard() {
-  return project.cards.find(card => card.id === editor.card.current) ?? null
+  let card = project.cards.find(card => card.id === editor.card.current)
+
+  if (!card && project.cards.length > 0) {
+    card = project.cards[0]
+    setEditor("card", "current", card.id)
+  }
+
+  return card ?? null
 }
 
 export function focusNode(nodeId) {
@@ -265,7 +287,7 @@ export function copyNode(nodeId) {
   if (!card) return
 
   const node = card.nodes.find(node => node.id === nodeId)
-clipboardNode = structuredClone(unwrap(node))
+  clipboardNode = structuredClone(unwrap(node))
 }
 
 export function pasteNode(cardId) {
@@ -287,7 +309,7 @@ export function duplicateNode(nodeId) {
   if (!card) return
 
   const node = card.nodes.find(node => node.id === nodeId)
-const copy = structuredClone(unwrap(node))
+  const copy = structuredClone(unwrap(node))
   copy.id = id()
 
   addNode(card.id, copy)
@@ -367,6 +389,7 @@ window.app = {
   addCard,
   removeCard,
   updateCard,
+  moveCard,
 
   addNode,
   removeNode,

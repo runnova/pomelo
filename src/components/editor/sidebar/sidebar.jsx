@@ -6,6 +6,7 @@ import {
 } from "solid-icons/hi";
 import { getCurrentCard, editor, addNode, updateNode, createTextNode, createMediaNode } from "../State"
 import "./style.css";
+import sampleMedia from "../../../assets/sample.png"
 
 export default function Sidebar() {
   const [page, setPage] = createSignal("insert");
@@ -100,7 +101,7 @@ export default function Sidebar() {
       type: "media",
       content: "",
       mediaType: "image",
-      src: "https://attachments.mistium.com/36a55c76-86ed-44c0-af47-5cb6acc85db1.png",
+      src: sampleMedia,
       style: {
         "font-size": "12px",
         "font-weight": 400,

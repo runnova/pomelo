@@ -68,4 +68,12 @@
       }
     }
   }
+
+  .timeline_item.dragging {
+    opacity: 0.4;
+  }
+
+  .timeline_item.drag_over {
+    outline: 2px dashed var(--hl-three);
+  }
 }

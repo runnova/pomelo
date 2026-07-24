@@ -1,5 +1,5 @@
 import "./style.css"
-import { For } from "solid-js"
+import { For, createSignal } from "solid-js"
 import {
   HiOutlinePlus,
   HiOutlineXMark,
@@ -10,18 +10,58 @@ import {
   setEditor,
   addCard,
   removeCard,
+  moveCard,
 } from "../State"
+
+const [dragId, setDragId] = createSignal(null)
+const [overIndex, setOverIndex] = createSignal(null)
 
 function TimelineItem(props) {
   return (
     <div
       class={
         "timeline_item " +
-        (editor.card.current === props.card.id ? "active" : "")
+        (editor.card.current === props.card.id ? "active " : "") +
+        (dragId() === props.card.id ? "dragging " : "") +
+        (overIndex() === props.index - 1 && dragId() !== null ? "drag_over " : "")
       }
+      draggable="true"
       onClick={() => setEditor("card", "current", props.card.id)}
+      onDragStart={e => {
+        setDragId(props.card.id)
+        e.dataTransfer.effectAllowed = "move"
+        e.dataTransfer.setData("text/plain", props.card.id)
+      }}
+      onDragEnd={() => {
+        setDragId(null)
+        setOverIndex(null)
+      }}
+      onDragOver={e => {
+        e.preventDefault()
+        e.dataTransfer.dropEffect = "move"
+        if (dragId() === null || dragId() === props.card.id) return
+
+        const rect = e.currentTarget.getBoundingClientRect()
+        const midpoint = rect.left + rect.width / 2
+        const targetIndex =
+          e.clientX < midpoint ? props.index - 1 : props.index
+
+        setOverIndex(targetIndex)
+      }}
+      onDrop={e => {
+        e.preventDefault()
+        const sourceId = dragId()
+        const targetIndex = overIndex()
+
+        if (sourceId !== null && targetIndex !== null) {
+          moveCard(sourceId, targetIndex)
+        }
+
+        setDragId(null)
+        setOverIndex(null)
+      }}
     >
-      <div class="index">{props.index}</div>
+      <div class="index">{props.index + 1}</div>
 
       <button
         class="remove"
@@ -44,7 +84,7 @@ export default function Timeline() {
           {(card, index) => (
             <TimelineItem
               card={card}
-              index={index() + 1}
+              index={index()}
             />
           )}
         </For>

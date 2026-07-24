@@ -98,21 +98,24 @@ export default function Headings() {
           <>
             <div class="label">Edit Element</div>
 
-            <div class="focusedNodeEditor">
-
-              <div class="inpgrp">
-                <div class="label">Content:</div>
-                <input
-                  class="input"
-                  value={node().content}
-                  onInput={e =>
-                    updateNodeById(node().id, n => ({
-                      ...n,
-                      content: e.currentTarget.value
-                    }))
-                  }
-                />
+            <div class="inpgrp">
+              <div class="label">
+                {node().type === "media" ? "Source:" : "Content:"}
               </div>
+              <input
+                class="input"
+                value={node().type === "media" ? node().src : node().content}
+                onInput={e =>
+                  updateNodeById(node().id, n => ({
+                    ...n,
+                    [n.type === "media" ? "src" : "content"]: e.currentTarget.value
+                  }))
+                }
+              />
+            </div>
+
+            <details class="css_editor">
+              <summary>CSS Styles</summary>
 
               <Index each={Object.entries(node().style ?? {})}>
                 {entry => {
@@ -138,35 +141,32 @@ export default function Headings() {
                   )
                 }}
               </Index>
-            </div>
 
-            <div class="label">New CSS:</div>
-            <div class="x thrinput">
-              <input
-                class="input"
-                placeholder="property"
-                value={newProperty()}
-                onInput={e =>
-                  setNewProperty(e.currentTarget.value)
-                }
-              />
+              <div class="label">New CSS:</div>
 
-              <input
-                class="input"
-                placeholder="value"
-                value={newValue()}
-                onInput={e =>
-                  setNewValue(e.currentTarget.value)
-                }
-              />
+              <div class="x thrinput">
+                <input
+                  class="input"
+                  placeholder="property"
+                  value={newProperty()}
+                  onInput={e => setNewProperty(e.currentTarget.value)}
+                />
 
-              <button
-                class="input"
-                onClick={() => addStyle(node().id)}
-              >
-                <HiOutlinePlus></HiOutlinePlus>
-              </button>
-            </div>
+                <input
+                  class="input"
+                  placeholder="value"
+                  value={newValue()}
+                  onInput={e => setNewValue(e.currentTarget.value)}
+                />
+
+                <button
+                  class="input"
+                  onClick={() => addStyle(node().id)}
+                >
+                  <HiOutlinePlus />
+                </button>
+              </div>
+            </details>
           </>
         )}
       </Show>
