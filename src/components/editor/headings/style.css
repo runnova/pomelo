@@ -110,3 +110,11 @@ summary {
   height: 3px;
   background-color: var(--hl-one);
 }
+
+.box {
+  padding: .5em;
+  display: block;
+  margin: .5em;
+  border-radius: .5em;
+  background-color: var(--diff-one);
+}

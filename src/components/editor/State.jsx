@@ -14,7 +14,7 @@ export const [project, setProject] = createStore({
     version: 1
   },
 
-  cards: []
+  cards: [createCard()]
 })
 
 export function createCard() {

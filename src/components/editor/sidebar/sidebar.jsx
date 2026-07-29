@@ -2,7 +2,9 @@ import { Show, createSignal, For } from "solid-js";
 import {
   HiOutlineArrowRightEndOnRectangle,
   HiOutlineArrowUpTray,
-  HiOutlineViewColumns
+  HiOutlineViewColumns,
+  HiOutlinePhoto,
+  HiOutlineDocumentText
 } from "solid-icons/hi";
 import { getCurrentCard, editor, addNode, updateNode, createTextNode, createMediaNode } from "../State"
 import "./style.css";
@@ -10,9 +12,10 @@ import sampleMedia from "../../../assets/sample.png"
 
 export default function Sidebar() {
   const [page, setPage] = createSignal("insert");
-
   const quickInsertTemplates = {
     H1: {
+      label: "Heading 1",
+      icon: HiOutlineDocumentText,
       type: "text",
       content: "Heading 1",
       style: {
@@ -27,6 +30,8 @@ export default function Sidebar() {
     },
 
     H2: {
+      label: "Heading 2",
+      icon: HiOutlineDocumentText,
       type: "text",
       content: "Heading 2",
       style: {
@@ -41,6 +46,8 @@ export default function Sidebar() {
     },
 
     H3: {
+      label: "Heading 3",
+      icon: HiOutlineDocumentText,
       type: "text",
       content: "Heading 3",
       style: {
@@ -55,6 +62,8 @@ export default function Sidebar() {
     },
 
     Sub: {
+      label: "Subtitle",
+      icon: HiOutlineDocumentText,
       type: "text",
       content: "Subtitle",
       style: {
@@ -69,6 +78,8 @@ export default function Sidebar() {
     },
 
     P: {
+      label: "Paragraph",
+      icon: HiOutlineDocumentText,
       type: "text",
       content: "Paragraph text",
       style: {
@@ -83,6 +94,8 @@ export default function Sidebar() {
     },
 
     Foot: {
+      label: "Footer",
+      icon: HiOutlineDocumentText,
       type: "text",
       content: "Footer text",
       style: {
@@ -98,19 +111,13 @@ export default function Sidebar() {
     },
 
     Media: {
+      label: "Image",
+      icon: HiOutlinePhoto,
       type: "media",
-      content: "",
+      content: "Media",
       mediaType: "image",
       src: sampleMedia,
-      style: {
-        "font-size": "12px",
-        "font-weight": 400,
-        "font-style": "normal",
-        "line-height": "1.4",
-        "letter-spacing": "0px",
-        "text-align": "left",
-        "text-decoration": "none"
-      }
+      style: {}
     }
   }
   const insertTemplate = (template) => {
@@ -154,16 +161,21 @@ export default function Sidebar() {
             <div>
               <div class="label">Quick Insert</div>
 
-              <div class="quick_insert_tiles">
-                <For each={Object.keys(quickInsertTemplates)}>
-                  {template => (
-                    <div
-                      class="insert_tile"
-                      onClick={() => insertTemplate(template)}
-                    >
-                      {template}
-                    </div>
-                  )}
+              <div class="quick_insert_tiles y">
+                <For each={Object.entries(quickInsertTemplates)}>
+                  {([key, template]) => {
+                    const Icon = template.icon;
+
+                    return (
+                      <div
+                        class="insert_tile"
+                        onClick={() => insertTemplate(key)}
+                      >
+                        <Icon />
+                        <span>{template.label}</span>
+                      </div>
+                    );
+                  }}
                 </For>
               </div>
 

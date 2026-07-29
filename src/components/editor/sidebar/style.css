@@ -21,14 +21,7 @@
   }
 
   & .quick_insert_tiles {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
-    width: 100%;
     gap: .3em;
-
-    &>* {
-      display: inline-flex;
-    }
   }
 
   & .insert_tile {
@@ -36,8 +29,10 @@
     background: var(--bg-two);
     border-radius: .3em;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    gap: .5em;
+    &:hover {
+      filter: brightness(1.2);
+    }
   }
 
   & .sidebar_content {

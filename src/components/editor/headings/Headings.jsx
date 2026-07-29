@@ -115,8 +115,7 @@ export default function Headings() {
             </div>
 
             <details class="css_editor">
-              <summary>CSS Styles</summary>
-
+              <summary>Properties</summary>
               <Index each={Object.entries(node().style ?? {})}>
                 {entry => {
                   const key = () => entry()[0]
@@ -144,6 +143,7 @@ export default function Headings() {
 
               <div class="label">New CSS:</div>
 
+              <small className="box warning">Custom CSS styles may not apply correctly when you export deck into different formats.</small>
               <div class="x thrinput">
                 <input
                   class="input"
