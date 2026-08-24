@@ -1,7 +1,107 @@
 import { createStore, unwrap } from "solid-js/store"
 
+import {
+  HiOutlinePhoto,
+  HiOutlineDocumentText
+} from "solid-icons/hi";
+
 const id = () => crypto.randomUUID()
 let clipboardNode = null
+
+import sampleMedia from "../../assets/sample.png"
+
+export const quickInsertTemplates = {
+  H1: {
+    label: "Heading 1",
+    icon: HiOutlineDocumentText,
+    type: "text",
+    content: "Heading 1",
+    style: {
+      "font-size": "48px",
+      "font-weight": 700,
+      "line-height": "1.1"
+    }
+  },
+
+  H2: {
+    label: "Heading 2",
+    icon: HiOutlineDocumentText,
+    type: "text",
+    content: "Heading 2",
+    style: {
+      "font-size": "36px",
+      "font-weight": 700,
+      "line-height": "1.2"
+    }
+  },
+
+  H3: {
+    label: "Heading 3",
+    icon: HiOutlineDocumentText,
+    type: "text",
+    content: "Heading 3",
+    style: {
+      "font-size": "28px",
+      "font-weight": 600,
+      "line-height": "1.3"
+    }
+  },
+
+  Sub: {
+    label: "Subtitle",
+    icon: HiOutlineDocumentText,
+    type: "text",
+    content: "Subtitle",
+    style: {
+      "font-size": "20px",
+      "line-height": "1.4"
+    }
+  },
+
+  P: {
+    label: "Paragraph",
+    icon: HiOutlineDocumentText,
+    type: "text",
+    content: "Paragraph text",
+    style: {}
+  },
+
+  MediaTiny: {
+    label: "Media Tiny",
+    icon: HiOutlinePhoto,
+    type: "media",
+    content: "Media",
+    mediaType: "image",
+    src: sampleMedia,
+    style: {
+      "height": "25%"
+    }
+  },
+
+  MediaBox: {
+    label: "Media Half",
+    icon: HiOutlinePhoto,
+    type: "media",
+    content: "Media",
+    mediaType: "image",
+    src: sampleMedia,
+    style: {
+      "height": "50%"
+    }
+  },
+
+  MediaVertical: {
+    label: "Media Full",
+    icon: HiOutlinePhoto,
+    type: "media",
+    content: "Media",
+    mediaType: "image",
+    src: sampleMedia,
+    style: {
+      "height": "100%"
+    }
+  }
+}
 
 export const [project, setProject] = createStore({
   id: id(),
@@ -44,29 +144,23 @@ export function createCard() {
   }
 }
 
+export const defaultTextStyle = {
+  "font-size": "16px",
+  "font-weight": 400,
+  "font-style": "normal",
+  "line-height": "1.5",
+  "letter-spacing": "normal",
+  "text-align": "left",
+  "text-decoration": "none"
+}
+
 export function createTextNode() {
   return {
     id: id(),
-
     type: "text",
-
     column: "text",
-
     content: "",
-
-    level: null,
-
-    footnote: null,
-
-    color: "#000000",
-    fontSize: "16px",
-    fontFamily: "sans-serif",
-    fontWeight: "400",
-    fontStyle: "normal",
-    textAlign: "left",
-    lineHeight: "1.5",
-    letterSpacing: "normal",
-    textDecoration: "none"
+    style: {}
   }
 }
 export function createMediaNode() {
@@ -95,6 +189,10 @@ export function createMediaNode() {
 
     controls: true
   }
+}
+
+export function getNodeStyle(node, property) {
+  return node.style?.[property] ?? defaultTextStyle[property]
 }
 
 export function addCard() {
@@ -205,8 +303,45 @@ export function loadProject(data) {
   setProject(data)
 }
 
+export function serializeNode(node) {
+  if (node.type === "text") {
+    return serializeTextNode(node)
+  }
+
+  return node
+}
+
+export function serializeTextNode(node) {
+  const style = {}
+
+  for (const [property, value] of Object.entries(node.style ?? {})) {
+    if (value !== defaultTextStyle[property]) {
+      style[property] = value
+    }
+  }
+
+  return {
+    id: node.id,
+    type: node.type,
+    column: node.column,
+    content: node.content,
+    ...(Object.keys(style).length > 0 ? { style } : {})
+  }
+}
+
 export function saveProject() {
-  return JSON.stringify(project, null, 2)
+  const data = unwrap(project)
+
+  const serialized = {
+    ...data,
+
+    cards: data.cards.map(card => ({
+      ...card,
+      nodes: card.nodes.map(serializeNode)
+    }))
+  }
+
+  return JSON.stringify(serialized, null, 2)
 }
 
 export function getCurrentCard() {
@@ -240,6 +375,7 @@ export function getFocusedNode() {
 export const [editor, setEditor] = createStore({
   projectPath: null,
   dirty: false,
+    previewMode: "visual",
 
   focus: null,
 
@@ -362,7 +498,7 @@ export function moveNode(cardId, nodeId, targetColumn, targetIndex) {
 }
 
 export function exportProject() {
-  const data = JSON.stringify(unwrap(project), null, 2)
+  const data = saveProject()
 
   const blob = new Blob([data], { type: "application/json" })
   const url = URL.createObjectURL(blob)
@@ -375,6 +511,33 @@ export function exportProject() {
   URL.revokeObjectURL(url)
 }
 
+export function setPreviewMode(mode) {
+  setEditor("previewMode", mode)
+}
+
+export function setCardRaw(cardId, data) {
+  const index = project.cards.findIndex(card => card.id === cardId)
+  if (index === -1) return
+  setProject("cards", index, data)
+}
+
+export function buildNodeFromTemplateDef(def) {
+  const { icon, label, style, ...fields } = def
+
+  const node = def.type === "media"
+    ? createMediaNode()
+    : createTextNode()
+
+  Object.assign(node, fields)
+
+  if (def.type === "text") {
+    node.style = { ...style }
+  } else if (style) {
+    node.style = { ...style }
+  }
+
+  return node
+}
 window.app = {
   project,
   setProject,

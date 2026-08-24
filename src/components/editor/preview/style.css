@@ -24,7 +24,6 @@
   min-width: 0;
   flex-direction: column;
   justify-content: center;
-  gap: 0.75em;
 }
 
 .media .node>* {
@@ -40,6 +39,15 @@
   align-items: center;
   gap: 0.75em;
   outline: 2px solid transparent;
+  cursor: grab;
+
+  &:active {
+      cursor: grabbing;
+  }
+
+  & [contenteditable="true"] {
+      cursor: text;
+  }
 
   & img {
     width: 100%;
@@ -80,7 +88,6 @@
   user-select: none;
 }
 
-/* Hover & active states */
 .node:hover .drag-handle {
   opacity: 1;
   color: var(--hl-one);
@@ -99,30 +106,39 @@
 .text-node {
   flex: 1;
 }
-
-/* Drop Indicators */
-.drop-indicator {
-  height: 4px;
-  background: var(--hl-one);
-  border-radius: 2px;
-  margin: 4px 0;
-  position: relative;
-  box-shadow: 0 0 0 3px rgba(var(--hl-one-rgb), 0.3);
-  animation: dropPulse 1.2s infinite ease-in-out;
-  opacity: 0.9;
+.drop-zone {
+  height: 0;
+  margin: 0;
+  border-radius: 8px;
+  background: rgba(99, 102, 241, 0.12);
+  border: 2px dashed transparent;
+  overflow: hidden;
+  pointer-events: none;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: height 120ms cubic-bezier(0.075, 0.82, 0.165, 1), margin 120ms cubic-bezier(0.075, 0.82, 0.165, 1), border-color 120ms cubic-bezier(0.075, 0.82, 0.165, 1), background 120ms cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
-.drop-indicator.before {
-  margin-bottom: -2px;
+.drop-zone.active {
+  height: 56px;
+  opacity: 1;
+  margin: 6px 0;
+  border-color: rgba(99, 102, 241, 0.6);
+  background: rgba(99, 102, 241, 0.15);
 }
 
-.drop-indicator.after {
-  margin-top: -2px;
+.drop-zone.column-end {
+  flex: 1 0 auto;
 }
 
-.drop-indicator.column-end {
-  margin-top: 12px;
-  height: 6px;
+.node img,
+.node video {
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+.col.drag-over {
+  background: rgba(99, 102, 241, 0.04);
+  border-radius: 12px;
 }
 
 @keyframes dropPulse {
@@ -165,4 +181,51 @@
   opacity: 0.5;
   font-size: small;
   padding: 0.5em;
+}
+
+.node.spacer {
+  flex: 1;
+  min-height: 40px;
+  border: 2px dashed transparent;
+  border-radius: 8px;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.node.spacer.drop-target {
+  border-color: var(--hl-one);
+  background-color: rgba(var(--hl-one-rgb), 0.08);
+}
+
+.json_editor {
+    height: 100%;
+}
+
+.json_editor_textarea {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  font: inherit;
+  font-family: monospace;
+  font-size: 1em;
+  padding: 12px;
+  resize: none;
+  border: none;
+  outline: none;
+  box-sizing: border-box;
+  background-color: transparent;
+  color: inherit;
+}
+
+.json_editor_error {
+  padding: 6px 12px;
+  color: #c0392b;
+  font-family: monospace;
+  font-size: 12px;
+  background: #fdecea;
+}
+
+
+.ace_editor_container {
+  width: 100%;
+  height: 100%;
 }

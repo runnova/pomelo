@@ -103,3 +103,23 @@ its JSON
     }
   ]
 }
+
+{
+  "id": "fab8ada5-e2d3-47a3-9f86-59e2981eab27",
+  "type": "text",
+  "column": "text",
+  "content": "Heading 1",
+  "level": null, REMOVE
+  "footnote": null, REMOVE
+  "style": {
+only store what is not 'default'. Keep default node styling if parameter undefined.
+  
+    "font-size": "48px",
+    "font-weight": 700,
+    "font-style": "normal",
+    "line-height": "1.1",
+    "letter-spacing": "0px",
+    "text-align": "left",
+    "text-decoration": "none"
+  }
+}

@@ -1,7 +1,6 @@
 import Dropdown from "../../utility/Dropdown"
-import { exportProject, loadProject } from "../State"
+import { exportProject, loadProject, editor, setPreviewMode } from "../State"
 import "./style.css"
-
 export default function Topbar() {
   let fileInput;
   return (
@@ -20,14 +19,12 @@ export default function Topbar() {
               onChange={async e => {
                 const file = e.currentTarget.files?.[0]
                 if (!file) return
-
                 try {
                   const text = await file.text()
                   loadProject(JSON.parse(text))
                 } catch (err) {
                   console.error("Invalid project file", err)
                 }
-
                 e.currentTarget.value = ""
               }}
             />
@@ -48,8 +45,18 @@ export default function Topbar() {
         </div>
         <div>
           <div className="raw_toggle x">
-            <div>Raw</div>
-            <div className="active">Preview</div>
+            <div
+              className={editor.previewMode === "json" ? "active" : ""}
+              onClick={() => setPreviewMode("json")}
+            >
+              Raw
+            </div>
+            <div
+              className={editor.previewMode === "json" ? "" : "active"}
+              onClick={() => setPreviewMode("visual")}
+            >
+              Preview
+            </div>
           </div>
         </div>
         <div>
@@ -63,9 +70,7 @@ export default function Topbar() {
             Export
           </button>
         </div>
-
       </div>
-
     </>
   )
 }
