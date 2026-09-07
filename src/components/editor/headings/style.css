@@ -1,6 +1,7 @@
 .headings_sidebar {
   border-left: 1px solid var(--diff-three);
   width: 350px;
+  overflow-y: auto;
 
   & .heading {
     padding: .5em .5em;
@@ -10,16 +11,16 @@
     }
 
     &>* {
-      font-size: 1em;
+      font-size: 1.5em;
       margin: 0;
     }
 
-    & h2 {
+    &.H2 {
       font-weight: normal;
-      font-size: .8em;
+      font-size: .9em;
     }
 
-    & h3 {
+    &.H3 {
       font-weight: normal;
       font-size: .8em;
     }

@@ -1,0 +1,169 @@
+.welcomer-root {
+  --welcomer-card-bg: var(--bg-two, #161616);
+  --welcomer-card-fg: var(--fg-one, #fff);
+  --welcomer-muted: var(--fg-two, #ffffff7a);
+  --welcomer-accent: var(--hl-one, #aaff2a);
+  --welcomer-accent-fg: var(--bg-one, #080808);
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  font-family: inherit;
+}
+
+.welcomer-overlay {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--bg-one, #080808) 25%, transparent);
+  animation: welcomer-fade 0.15s ease-out;
+}
+
+.welcomer-highlight {
+  position: fixed;
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px var(--welcomer-accent),
+    0 0 0 9999px color-mix(in srgb, var(--bg-one, #080808) 65%, transparent);
+  pointer-events: none;
+  transition: top 0.2s ease, left 0.2s ease, width 0.2s ease, height 0.2s ease;
+}
+
+.welcomer-card {
+  position: fixed;
+  background: var(--welcomer-card-bg);
+  color: var(--welcomer-card-fg);
+  border-radius: 6px;
+  box-shadow: var(--border, 0 0 0 1px #fff3), 0 12px 32px rgba(0, 0, 0, 0.5);
+  padding: 16px 18px;
+  width: 300px;
+  max-width: calc(100vw - 24px);
+  box-sizing: border-box;
+  animation: welcomer-pop 0.16s ease-out;
+}
+
+.welcomer-card--anchored {
+  transition: top 0.18s ease, left 0.18s ease;
+}
+
+.welcomer-card--centered {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 340px;
+  text-align: center;
+  padding: 28px 24px 22px;
+}
+
+.welcomer-pager {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--hl-one, #aaff2a);
+  opacity: 0.85;
+  margin-bottom: 10px;
+}
+
+.welcomer-title {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--fg-one, #fff);
+}
+
+.welcomer-text {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--fg-dim, #ffffffb7);
+}
+
+.welcomer-actions {
+  display: flex;
+  align-items: center;
+  margin-top: 14px;
+  gap: 2px;
+}
+
+.welcomer-actions--tour {
+  justify-content: flex-end;
+}
+
+.welcomer-actions--centered {
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.welcomer-btn {
+  all: unset;
+  box-sizing: border-box;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  padding: 0.5em 0.9em;
+  cursor: pointer;
+  border-radius: 4px;
+  text-align: center;
+  transition: background-color 0.1s ease, opacity 0.1s ease;
+}
+
+.welcomer-btn:active {
+  opacity: 0.8;
+}
+
+.welcomer-btn--primary {
+  background: var(--welcomer-accent);
+  color: var(--welcomer-accent-fg);
+  font-weight: 600;
+}
+
+.welcomer-btn--primary:hover {
+  background: var(--hl-two, #d5ff95);
+}
+
+.welcomer-btn--ghost {
+  color: var(--fg-one, #fff);
+  margin-right: auto;
+}
+
+.welcomer-btn--ghost:hover {
+  background-color: var(--diff-three, color-mix(in srgb, #3a3a3a 45%, transparent));
+}
+
+.welcomer-btn--ghost:disabled {
+  opacity: 0.3;
+  cursor: default;
+  background-color: transparent;
+}
+
+.welcomer-btn--text {
+  color: var(--welcomer-muted);
+}
+
+.welcomer-btn--text:hover {
+  background-color: var(--diff-three, color-mix(in srgb, #3a3a3a 45%, transparent));
+  color: var(--fg-one, #fff);
+}
+
+.welcomer-actions--centered .welcomer-btn--primary {
+  width: 100%;
+  padding: 0.7em 1em;
+}
+
+@keyframes welcomer-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes welcomer-pop {
+  from { opacity: 0; transform: scale(0.97) translateY(2px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.welcomer-card--centered {
+  animation: welcomer-pop-center 0.18s ease-out;
+}
+
+@keyframes welcomer-pop-center {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.96); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}

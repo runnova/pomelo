@@ -15,9 +15,9 @@ import {
   moveNode,
   updateNodeById,
   addNode,
-  quickInsertTemplates,
   buildNodeFromTemplateDef,
 } from "../../State";
+import { quickInsertTemplates } from "../../substate/quickInsertTemplates";
 
 const TAP_MAX_DURATION = 200;
 const MOVE_THRESHOLD = 8;
@@ -87,8 +87,46 @@ function RenderText(props) {
   );
 }
 
+// Track mounted media elements keyed by the node id they belong to.
+// This lets any effect definitively pause everything that isn't part
+// of the currently active card, instead of relying on autoplay timing
+// or DOM lookups via closest(".node") (which can race with unmount).
+const previewMedia = new Map();
+
+function stopMediaElement(media) {
+  try {
+    media.pause();
+  } catch {}
+  media.removeAttribute("src");
+  media.load();
+}
+
 function RenderMedia(props) {
   const { node } = props;
+  let media;
+
+  onMount(() => {
+    if (!media) return;
+
+    previewMedia.set(node.id, { el: media, cardId: props.cardId });
+
+    // Don't rely on the native `autoplay` attribute: it fires as soon as
+    // the element is attached, which can race ahead of the page-change
+    // cleanup effect and stack multiple tracks. Gate playback on the
+    // node's card actually being the current one, and drive it manually.
+    if (node.autoplay && getCurrentCard()?.id === props.cardId) {
+      media.play().catch(() => {});
+    }
+  });
+
+  onCleanup(() => {
+    if (!media) return;
+
+    previewMedia.delete(node.id);
+    stopMediaElement(media);
+    media = null;
+  });
+
   switch (node.mediaType) {
     case "image":
       return (
@@ -99,18 +137,33 @@ function RenderMedia(props) {
           style={{ "object-fit": node.fit }}
         />
       );
+
     case "video":
       return (
         <video
+          ref={media}
           src={node.src}
           controls={node.controls}
-          autoplay={node.autoplay}
           loop={node.loop}
           muted={node.muted}
           draggable={false}
           style={{ "object-fit": node.fit }}
         />
       );
+
+    case "audio":
+      return (
+        <audio
+          ref={media}
+          src={node.src}
+          controls={node.controls}
+          loop={node.loop}
+          muted={node.muted}
+          draggable={false}
+          style={{ "object-fit": node.fit }}
+        />
+      );
+
     default:
       return null;
   }
@@ -351,7 +404,7 @@ function RenderNode(props) {
         {node.type === "text" ? (
           <RenderText node={node} />
         ) : (
-          <RenderMedia node={node} />
+          <RenderMedia node={node} cardId={cardId} />
         )}
       </div>
     </>
@@ -369,12 +422,41 @@ function ColumnEndIndicator(props) {
 }
 
 export default function PreviewPage(props) {
+  // Whenever the current card changes, stop every tracked media element
+  // that doesn't belong to a node on the new card. This is keyed off the
+  // node-id -> element map (not DOM lookups) so it can't race with
+  // mount/unmount timing, and it deliberately does NOT depend on
+  // `editor.focus` so it only reacts to page changes, not focus changes.
+  createEffect(() => {
+    const card = getCurrentCard();
+    if (!card) return;
+
+    const currentIds = new Set(card.nodes.map((n) => n.id));
+
+    for (const [nodeId, { el, cardId }] of previewMedia) {
+      if (cardId !== card.id || !currentIds.has(nodeId)) {
+        stopMediaElement(el);
+      }
+    }
+  });
+
+  onCleanup(() => {
+    for (const { el } of previewMedia.values()) {
+      stopMediaElement(el);
+    }
+    previewMedia.clear();
+  });
+
   onMount(() => {
     const handler = (e) => {
       if (e.key === "Escape") blurNode();
     };
+
     window.addEventListener("keydown", handler);
-    onCleanup(() => window.removeEventListener("keydown", handler));
+
+    onCleanup(() => {
+      window.removeEventListener("keydown", handler);
+    });
   });
 
   return (
@@ -403,7 +485,11 @@ export default function PreviewPage(props) {
           >
             <For each={card().nodes.filter((n) => n.column === "text")}>
               {(node, index) => (
-                <RenderNode node={node} cardId={card().id} index={index()} />
+                <RenderNode
+                  node={node}
+                  cardId={card().id}
+                  index={index()}
+                />
               )}
             </For>
 
@@ -423,9 +509,14 @@ export default function PreviewPage(props) {
           >
             <For each={card().nodes.filter((n) => n.column === "media")}>
               {(node, index) => (
-                <RenderNode node={node} cardId={card().id} index={index()} />
+                <RenderNode
+                  node={node}
+                  cardId={card().id}
+                  index={index()}
+                />
               )}
             </For>
+
             <ColumnEndIndicator column="media" />
           </div>
         </div>

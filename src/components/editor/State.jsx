@@ -1,106 +1,40 @@
 import { createStore, unwrap } from "solid-js/store"
-
-import {
-  HiOutlinePhoto,
-  HiOutlineDocumentText
-} from "solid-icons/hi";
+import { zipSync, unzipSync, strToU8 } from "fflate"
+import { getAssetExtension } from "../utility/Utility"
 
 const id = () => crypto.randomUUID()
 let clipboardNode = null
 
-import sampleMedia from "../../assets/sample.png"
+const blobUrlCache = new Map()
 
-export const quickInsertTemplates = {
-  H1: {
-    label: "Heading 1",
-    icon: HiOutlineDocumentText,
-    type: "text",
-    content: "Heading 1",
-    style: {
-      "font-size": "48px",
-      "font-weight": 700,
-      "line-height": "1.1"
-    }
-  },
-
-  H2: {
-    label: "Heading 2",
-    icon: HiOutlineDocumentText,
-    type: "text",
-    content: "Heading 2",
-    style: {
-      "font-size": "36px",
-      "font-weight": 700,
-      "line-height": "1.2"
-    }
-  },
-
-  H3: {
-    label: "Heading 3",
-    icon: HiOutlineDocumentText,
-    type: "text",
-    content: "Heading 3",
-    style: {
-      "font-size": "28px",
-      "font-weight": 600,
-      "line-height": "1.3"
-    }
-  },
-
-  Sub: {
-    label: "Subtitle",
-    icon: HiOutlineDocumentText,
-    type: "text",
-    content: "Subtitle",
-    style: {
-      "font-size": "20px",
-      "line-height": "1.4"
-    }
-  },
-
-  P: {
-    label: "Paragraph",
-    icon: HiOutlineDocumentText,
-    type: "text",
-    content: "Paragraph text",
-    style: {}
-  },
-
-  MediaTiny: {
-    label: "Media Tiny",
-    icon: HiOutlinePhoto,
-    type: "media",
-    content: "Media",
-    mediaType: "image",
-    src: sampleMedia,
-    style: {
-      "height": "25%"
-    }
-  },
-
-  MediaBox: {
-    label: "Media Half",
-    icon: HiOutlinePhoto,
-    type: "media",
-    content: "Media",
-    mediaType: "image",
-    src: sampleMedia,
-    style: {
-      "height": "50%"
-    }
-  },
-
-  MediaVertical: {
-    label: "Media Full",
-    icon: HiOutlinePhoto,
-    type: "media",
-    content: "Media",
-    mediaType: "image",
-    src: sampleMedia,
-    style: {
-      "height": "100%"
-    }
+function getOrCreateBlobUrl(asset) {
+  if (blobUrlCache.has(asset.id)) {
+    return blobUrlCache.get(asset.id)
   }
+
+  const blob = new Blob([asset.data], { type: asset.mimeType || "" })
+  const url = URL.createObjectURL(blob)
+
+  blobUrlCache.set(asset.id, url)
+
+  return url
+}
+
+function revokeBlobUrl(assetId) {
+  const url = blobUrlCache.get(assetId)
+
+  if (url) {
+    URL.revokeObjectURL(url)
+    blobUrlCache.delete(assetId)
+  }
+}
+
+function clearBlobUrlCache() {
+  for (const url of blobUrlCache.values()) {
+    URL.revokeObjectURL(url)
+  }
+
+  blobUrlCache.clear()
 }
 
 export const [project, setProject] = createStore({
@@ -114,7 +48,10 @@ export const [project, setProject] = createStore({
     version: 1
   },
 
-  cards: [createCard()]
+  cards: [createCard()],
+
+  // embedded, packageable files. node.src references these by `id`.
+  assets: []
 })
 
 export function createCard() {
@@ -171,7 +108,7 @@ export function createMediaNode() {
 
     column: "media",
 
-    src: "",
+    src: "", // asset id, or an external URL
 
     mediaType: "image",
 
@@ -194,6 +131,128 @@ export function createMediaNode() {
 export function getNodeStyle(node, property) {
   return node.style?.[property] ?? defaultTextStyle[property]
 }
+
+// ================= Embedded assets =================
+
+export async function embedFile(file) {
+  const buffer = await file.arrayBuffer()
+  const data = new Uint8Array(buffer)
+
+  const extension = getAssetExtension(file.name, file.type)
+
+  const asset = {
+    id: id(),
+    name: file.name,
+    mimeType: file.type || "application/octet-stream",
+    extension,
+    size: data.byteLength,
+    data
+  }
+
+  setProject("assets", assets => [...assets, asset])
+
+  return asset.id
+}
+
+export async function embedFileFromUrl(url, name) {
+  const existing = project.assets.find(asset => asset.sourceUrl === url)
+  if (existing) return existing.id
+
+  const response = await fetch(url)
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch asset: ${url}`)
+  }
+
+  const buffer = await response.arrayBuffer()
+  const data = new Uint8Array(buffer)
+  const mimeType = response.headers.get("content-type") || ""
+  const extension = getAssetExtension(url, mimeType)
+  const filename = name || url.split("/").pop()?.split("?")[0] || `asset${extension}`
+
+  const asset = {
+    id: id(),
+    name: filename,
+    mimeType,
+    extension,
+    size: data.byteLength,
+    sourceUrl: url,
+    data
+  }
+
+  setProject("assets", assets => [...assets, asset])
+
+  return asset.id
+}
+
+export function getEmbeddedFileById(assetId) {
+  return project.assets.find(asset => asset.id === assetId) ?? null
+}
+
+export function listEmbedded() {
+  return project.assets
+}
+
+export function removeEmbeddedFile(assetId) {
+  const index = project.assets.findIndex(asset => asset.id === assetId)
+
+  if (index === -1) return
+
+  revokeBlobUrl(assetId)
+
+  setProject("assets", assets => assets.filter(asset => asset.id !== assetId))
+}
+
+export function cleanupUnusedAssets() {
+  const usedIds = new Set()
+
+  for (const card of project.cards) {
+    for (const node of card.nodes) {
+      if (node.type === "media" && node.src) {
+        usedIds.add(node.src)
+      }
+    }
+  }
+
+  const unused = project.assets.filter(asset => !usedIds.has(asset.id))
+
+  for (const asset of unused) {
+    removeEmbeddedFile(asset.id)
+  }
+
+  return unused.map(asset => asset.id)
+}
+
+export function downloadEmbeddedFileById(assetId) {
+  const asset = getEmbeddedFileById(assetId)
+
+  if (!asset) return
+
+  const url = getOrCreateBlobUrl(asset)
+
+  const a = document.createElement("a")
+  a.href = url
+  a.download = asset.name || `${asset.id}${asset.extension || ""}`
+  a.click()
+}
+
+// Global helper: resolve a node's `src` (asset id OR external URL) to
+// something the browser can render. Blob URLs are only created here,
+// on first access, and reused afterwards.
+export function resolveAssetSrc(src) {
+  if (!src) return src
+
+  const asset = project.assets.find(a => a.id === src)
+
+  if (asset) {
+    return getOrCreateBlobUrl(asset)
+  }
+
+  // not an embedded asset — treat as a plain external URL / already-a-blob-url
+  return src
+}
+
+// ================= Cards / nodes (unchanged) =================
 
 export function addCard() {
   const card = createCard()
@@ -252,7 +311,6 @@ export function addNode(cardId, node) {
 }
 
 export function removeNode(cardId, nodeId) {
-  console.log(cardId, nodeId)
   const cardIndex = project.cards.findIndex(card => card.id === cardId)
 
   if (cardIndex === -1) return
@@ -300,6 +358,7 @@ export function getCardIndex(cardId) {
 }
 
 export function loadProject(data) {
+  clearBlobUrlCache()
   setProject(data)
 }
 
@@ -338,7 +397,10 @@ export function saveProject() {
     cards: data.cards.map(card => ({
       ...card,
       nodes: card.nodes.map(serializeNode)
-    }))
+    })),
+
+    // exclude raw binary from plain JSON saves; keep metadata only
+    assets: data.assets.map(({ data: _bytes, ...meta }) => meta)
   }
 
   return JSON.stringify(serialized, null, 2)
@@ -375,7 +437,7 @@ export function getFocusedNode() {
 export const [editor, setEditor] = createStore({
   projectPath: null,
   dirty: false,
-    previewMode: "visual",
+  previewMode: "visual",
 
   focus: null,
 
@@ -497,18 +559,82 @@ export function moveNode(cardId, nodeId, targetColumn, targetIndex) {
   setProject("cards", cardIndex, "nodes", nodes)
 }
 
-export function exportProject() {
-  const data = saveProject()
+// ================= Export / Import =================
 
-  const blob = new Blob([data], { type: "application/json" })
+export async function exportProject() {
+  const data = unwrap(project)
+
+  const serialized = {
+    ...data,
+
+    cards: data.cards.map(card => ({
+      ...card,
+      nodes: card.nodes.map(serializeNode)
+    })),
+
+    assets: data.assets.map(({ data: _bytes, ...meta }) => meta)
+  }
+
+  const files = {}
+
+  for (const asset of data.assets) {
+    files[`assets/${asset.id}${asset.extension || ""}`] = asset.data
+  }
+
+  files["project.json"] = strToU8(
+    JSON.stringify(serialized, null, 2)
+  )
+
+  const zipped = zipSync(files, {
+    level: 6
+  })
+
+  const blob = new Blob([zipped], {
+    type: "application/zip"
+  })
+
   const url = URL.createObjectURL(blob)
 
   const a = document.createElement("a")
   a.href = url
-  a.download = `${project.meta.title || "project"}.json`
+  a.download = `${project.meta.title || "project"}.zip`
   a.click()
 
   URL.revokeObjectURL(url)
+}
+
+export async function importProject(file) {
+  const buffer = await file.arrayBuffer()
+  const files = unzipSync(new Uint8Array(buffer))
+
+  const projectFile = files["project.json"]
+
+  if (!projectFile) {
+    throw new Error("Invalid project: project.json is missing")
+  }
+
+  const data = JSON.parse(
+    new TextDecoder().decode(projectFile)
+  )
+
+  data.assets = (data.assets ?? []).map(meta => {
+    const path = `assets/${meta.id}${meta.extension || ""}`
+    const bytes = files[path]
+
+    return {
+      ...meta,
+      data: bytes ?? new Uint8Array()
+    }
+  })
+
+  loadProject(data)
+
+  setEditor("card", "current", data.cards?.[0]?.id ?? null)
+  setEditor("focus", null)
+  setEditor("card", "selected", [])
+  setEditor("node", "selected", [])
+
+  return data
 }
 
 export function setPreviewMode(mode) {
@@ -522,22 +648,33 @@ export function setCardRaw(cardId, data) {
 }
 
 export function buildNodeFromTemplateDef(def) {
-  const { icon, label, style, ...fields } = def
+  const node = def.type === "media" ? createMediaNode() : createTextNode();
 
-  const node = def.type === "media"
-    ? createMediaNode()
-    : createTextNode()
+  const { icon, label, type, ...fields } = def;
+  Object.assign(node, fields);
 
-  Object.assign(node, fields)
-
-  if (def.type === "text") {
-    node.style = { ...style }
-  } else if (style) {
-    node.style = { ...style }
-  }
-
-  return node
+  return node;
 }
+
+export function getProjectHeadings() {
+  return project.cards.flatMap(card =>
+    card.nodes
+      .filter(node =>
+        ["H1", "H2", "H3", "Sub"].includes(node.heading)
+      )
+      .map(node => ({
+        cardId: card.id,
+        node
+      }))
+  )
+}
+
+export function setCardRatio(cardId, ratio) {
+  const index = project.cards.findIndex(card => card.id === cardId)
+  if (index === -1) return
+  setProject("cards", index, "layout", "ratio", ratio)
+}
+
 window.app = {
   project,
   setProject,
@@ -560,12 +697,22 @@ window.app = {
 
   loadProject,
   saveProject,
+  importProject,
+  exportProject,
 
   getCurrentCard,
+  getProjectHeadings,
 
   focusNode,
   blurNode,
   getFocusedNode,
 
-  exportProject
+  embedFile,
+  embedFileFromUrl,
+  getEmbeddedFileById,
+  listEmbedded,
+  removeEmbeddedFile,
+  cleanupUnusedAssets,
+  downloadEmbeddedFileById,
+  resolveAssetSrc
 }

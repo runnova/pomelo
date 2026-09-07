@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "ace-builds": "^1.44.0",
+    "fflate": "^0.8.3",
     "html-to-image": "^1.11.13",
     "solid-icons": "^1.2.0",
     "solid-js": "^1.9.13"

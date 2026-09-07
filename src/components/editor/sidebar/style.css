@@ -21,7 +21,9 @@
   }
 
   & .quick_insert_tiles {
-    gap: .3em;
+      gap: .3em;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(75px, 1fr));
   }
 
   & .insert_tile {
@@ -30,8 +32,22 @@
     border-radius: .3em;
     display: flex;
     gap: .5em;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    font-size: small;
+    fill: var(--fg-one);
     &:hover {
       filter: brightness(1.2);
+    }
+    & svg {
+        width: 80%;
+        height: 18pt;
+    }
+    &.active {
+      background:var(--hl-four);
+      fill: var(--hl-two);
+      color: var(--hl-two);
     }
   }
 

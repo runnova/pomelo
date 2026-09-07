@@ -24,6 +24,7 @@
   min-width: 0;
   flex-direction: column;
   justify-content: center;
+  transition: .3s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
 .media .node>* {

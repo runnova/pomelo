@@ -1,12 +1,13 @@
-# slideshow/cards renderer
-
+# to do
+- uploads
+- text formatting 
+- media/node options
+- page theme
+- user theme selector
+- slideshow player
 
 ## screens
 - the homescreen
-  - grid/table of all projects
-    - project management
-    - clicking project opens it in editor
-  - new project button
 - editor
   1. editing
     - *topbar*
@@ -63,11 +64,6 @@
 
 ## card
 - card has top navigation to nearest previous biggest heading when there is no or smaller heading in page
-- card has 2 columns
-  1. text column
-    can contain text, headings, footnote
-  2. media column
-    can contain media, caption and credit.
 - column width ratio can be set in sidebar>column editor
 
 ## node types
@@ -104,22 +100,6 @@ its JSON
   ]
 }
 
-{
-  "id": "fab8ada5-e2d3-47a3-9f86-59e2981eab27",
-  "type": "text",
-  "column": "text",
-  "content": "Heading 1",
-  "level": null, REMOVE
-  "footnote": null, REMOVE
-  "style": {
-only store what is not 'default'. Keep default node styling if parameter undefined.
-  
-    "font-size": "48px",
-    "font-weight": 700,
-    "font-style": "normal",
-    "line-height": "1.1",
-    "letter-spacing": "0px",
-    "text-align": "left",
-    "text-decoration": "none"
-  }
-}
+
+SETTINGS 
+- media dont autoplay in editor

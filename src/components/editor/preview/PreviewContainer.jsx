@@ -6,9 +6,7 @@ import {
   HiOutlineBackward,
   HiOutlineForward,
   HiOutlinePause,
-  HiOutlinePlay,
-  HiOutlineCodeBracket,
-  HiOutlineEye,
+  HiOutlinePlay
 } from "solid-icons/hi"
 import { editor, getCardIndex, setPreviewMode } from "../State";
 import PreviewPage from "./page/PreviewPage";
@@ -43,16 +41,6 @@ export default function PreviewContainer() {
           </button>
           <button aria-label="Next">
             <HiOutlineForward size={20} />
-          </button>
-          <button
-            aria-label={editor.previewMode === "json" ? "Visual editor" : "JSON editor"}
-            onClick={() => setPreviewMode(editor.previewMode === "json" ? "visual" : "json")}
-          >
-            {editor.previewMode === "json" ? (
-              <HiOutlineEye size={20} />
-            ) : (
-              <HiOutlineCodeBracket size={20} />
-            )}
           </button>
         </div>
         <Range

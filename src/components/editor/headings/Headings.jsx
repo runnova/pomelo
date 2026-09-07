@@ -9,7 +9,8 @@ import {
   pasteNode,
   duplicateNode,
   hasClipboardNode,
-  focusNode
+  focusNode,
+  setEditor
 } from "../State"
 
 import {
@@ -46,7 +47,7 @@ export default function Headings() {
   }
 
   return (
-    <div class="headings_sidebar">
+    <div class="headings_sidebar y">
       <div class="quick_action_tiles x">
         <button
           disabled={!focusedNode()}
@@ -171,13 +172,15 @@ export default function Headings() {
         )}
       </Show>
       <div class="label">Headings</div>
-
-      <div class="heading">
-        <h1>Hi</h1>
-      </div>
-
-      <div class="heading active">
-        <h2>Hello</h2>
+      <div className="headingScroller y fill">
+        {window.app.getProjectHeadings().map(({ cardId, node }) => (
+          <div
+            className={"heading "+ node.heading}
+            onClick={() => setEditor("card", "current",  cardId)}
+          >
+            <span>{node.content}</span>
+          </div>
+        ))}
       </div>
     </div>
   )
