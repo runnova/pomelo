@@ -119,3 +119,36 @@ summary {
   border-radius: .5em;
   background-color: var(--diff-one);
 }
+
+
+.toggle_group {
+    background-color: var(--bg-two);
+    border-radius: .3em;
+    margin-right: .5em;
+
+    &.seperate_inputs {
+        gap: .3em;
+        background-color: transparent;
+    }
+}
+.toggle_group.wrap {
+  flex-wrap: wrap;
+}
+.toggle_group button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: .3em;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+
+  &:hover {
+      background-color: var(--diff-two);
+  }
+}
+.toggle_group button.active {
+  background: var(--hl-four);
+  color: var(--hl-two);
+}

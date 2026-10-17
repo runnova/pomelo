@@ -24,8 +24,8 @@ export default function PreviewContainer() {
         </Show>
       </div>
       <div class="player_buttons x">
-        <div className="current_index_display">Page {getCardIndex(editor.card.current)} / {app.project.cards.length}</div>
-        <div className="btngrp">
+        <div class="current_index_display">Page {getCardIndex(editor.card.current)}</div>
+        <div class="btngrp">
           <button aria-label="Previous">
             <HiOutlineBackward size={20} />
           </button>

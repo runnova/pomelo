@@ -147,7 +147,7 @@ export default function Sidebar() {
 
           <Show when={page() === "layout"}>
             <div class="label">Layout</div>
-            <div className="quick_insert_tiles">
+            <div class="quick_insert_tiles">
               <div
                 class="insert_tile"
                 classList={{ active: getCurrentCard()?.layout.ratio.join(",") === "1,1" }}

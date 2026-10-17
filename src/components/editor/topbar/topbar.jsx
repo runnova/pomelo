@@ -8,9 +8,9 @@ export default function Topbar() {
   const [settingsOpen, setSettingsOpen] = createSignal(false);
   return (
     <>
-      <div className="topbar x">
+      <div class="topbar x">
         <div>
-          <button className="btn alive">
+          <button class="btn alive">
             Pomelo
           </button>
           <Dropdown label="File">
@@ -59,15 +59,15 @@ export default function Topbar() {
           </Dropdown>
         </div>
         <div>
-          <div className="raw_toggle x">
+          <div class="raw_toggle x">
             <div
-              className={editor.previewMode === "json" ? "active" : ""}
+              class={editor.previewMode === "json" ? "active" : ""}
               onClick={() => setPreviewMode("json")}
             >
               Raw
             </div>
             <div
-              className={editor.previewMode === "json" ? "" : "active"}
+              class={editor.previewMode === "json" ? "" : "active"}
               onClick={() => setPreviewMode("visual")}
             >
               Preview
@@ -75,13 +75,13 @@ export default function Topbar() {
           </div>
         </div>
         <div>
-          <button className="btn">
+          <button class="btn">
             Saving...
           </button>
-          <button className="play_project_button alive btn">
+          <button class="play_project_button alive btn">
             Play
           </button>
-          <button className="export_project_button alive btn" onClick={exportProject}>
+          <button class="export_project_button alive btn" onClick={exportProject}>
             Export
           </button>
         </div>
