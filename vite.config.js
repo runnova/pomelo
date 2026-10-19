@@ -3,5 +3,5 @@ import solid from "vite-plugin-solid";
 
 export default defineConfig(({ command }) => ({
   plugins: [solid()],
- base: "/"
+  base: command === "build" ? "/pomelo/" : "/",
 }));

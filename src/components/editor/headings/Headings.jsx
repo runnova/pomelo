@@ -45,7 +45,6 @@ const MEDIA_FLAGS = [
   { key: "controls", label: "Controls" }
 ]
 
-// ---- text-decoration helpers (underline + line-through can coexist) ----
 const getDecorations = node => {
   const value = String(getNodeStyle(node, "text-decoration") ?? "none")
   return value.split(/\s+/).filter(token => token && token !== "none")

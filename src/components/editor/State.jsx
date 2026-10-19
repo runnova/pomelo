@@ -50,7 +50,6 @@ export const [project, setProject] = createStore({
 
   cards: [createCard()],
 
-  // embedded, packageable files. node.src references these by `id`.
   assets: []
 })
 
@@ -108,7 +107,7 @@ export function createMediaNode() {
 
     column: "media",
 
-    src: "", // asset id, or an external URL
+    src: "",
 
     mediaType: "image",
 
@@ -131,8 +130,6 @@ export function createMediaNode() {
 export function getNodeStyle(node, property) {
   return node.style?.[property] ?? defaultTextStyle[property]
 }
-
-// ================= Embedded assets =================
 
 export async function embedFile(file) {
   const buffer = await file.arrayBuffer()
@@ -236,9 +233,6 @@ export function downloadEmbeddedFileById(assetId) {
   a.click()
 }
 
-// Global helper: resolve a node's `src` (asset id OR external URL) to
-// something the browser can render. Blob URLs are only created here,
-// on first access, and reused afterwards.
 export function resolveAssetSrc(src) {
   if (!src) return src
 
@@ -248,11 +242,8 @@ export function resolveAssetSrc(src) {
     return getOrCreateBlobUrl(asset)
   }
 
-  // not an embedded asset — treat as a plain external URL / already-a-blob-url
   return src
 }
-
-// ================= Cards / nodes (unchanged) =================
 
 export function addCard() {
   const card = createCard()
@@ -399,7 +390,6 @@ export function saveProject() {
       nodes: card.nodes.map(serializeNode)
     })),
 
-    // exclude raw binary from plain JSON saves; keep metadata only
     assets: data.assets.map(({ data: _bytes, ...meta }) => meta)
   }
 
@@ -558,8 +548,6 @@ export function moveNode(cardId, nodeId, targetColumn, targetIndex) {
 
   setProject("cards", cardIndex, "nodes", nodes)
 }
-
-// ================= Export / Import =================
 
 export async function exportProject() {
   const data = unwrap(project)

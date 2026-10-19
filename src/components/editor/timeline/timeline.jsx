@@ -22,7 +22,6 @@ async function captureThumb(cardId) {
   const el = document.querySelector(`.card.previewPage`)
   if (!el) return
 
-  // Only capture if this is currently the rendered/current card
   if (editor.card.current !== cardId) return
 
   try {
@@ -41,8 +40,6 @@ function TimelineItem(props) {
   let debounceTimer
 
   createEffect(() => {
-    // Re-capture whenever this card's nodes/layout/background change
-    // (touching card fields makes this effect track them)
     JSON.stringify(props.card)
 
     if (editor.card.current !== props.card.id) return
